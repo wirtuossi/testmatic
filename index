@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Игра с подключением криптокошелька (Polygon)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.5.2/web3.min.js"></script>
+</head>
+<body>
+    <h1>Игра с подключением криптокошелька (Polygon)</h1>
+
+    <div id="game-container">
+        <!-- Вставьте код вашей игры здесь -->
+    </div>
+
+    <button id="connect-wallet-button">Подключить кошелек</button>
+    <button id="execute-transaction-button">Выполнить транзакцию</button>
+
+    <script>
+        // Ваш JavaScript код игры
+
+        // Переменная для хранения экземпляра Web3
+        let web3;
+
+        // Функция подключения криптокошелька
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
+                try {
+                    // Подключение криптокошелька в сети Polygon (Matic)
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{
+                            chainId: '0x89', // Chain ID для сети Polygon (Matic)
+                            chainName: 'Polygon',
+                            nativeCurrency: {
+                                name: 'MATIC',
+                                symbol: 'MATIC',
+                                decimals: 18
+                            },
+                            rpcUrls: ['https://rpc-mainnet.maticvigil.com'], // RPC-URL для сети Polygon (Matic)
+                            blockExplorerUrls: ['https://explorer.matic.network'] // URL блок-эксплорера для сети Polygon (Matic)
+                        }]
+                    });
+
+                    await window.ethereum.enable();
+                    console.log("Кошелек успешно подключен");
+                } catch (error) {
+                    console.error("Ошибка при подключении кошелька:", error);
+                }
+            } else {
+                console.error("Криптокошелек не найден");
+            }
+        }
+
+        // Функция выполнения транзакции
+        async function executeTransaction(amount) {
+            try {
+                const accounts = await web3.eth.getAccounts();
+                const transaction = {
+                    from: accounts[0],
+                    to: '0xf3Ac5D4057F6AF98e9a820a99e8Df7C9A214438d',
+                    value: web3.utils.toWei(amount, 'ether')
+                };
+                await web3.eth.sendTransaction(transaction);
+                console.log("Транзакция выполнена успешно");
+            } catch (error) {
+                console.error("Ошибка при выполнении транзакции:", error);
+            }
+        }
+
+        // Обработка нажатия кнопки "Подключить кошелек"
+        document.getElementById('connect-wallet-button').addEventListener('click', connectWallet);
+
+        // Обработка нажатия кнопки "Выполнить транзакцию"
+        document.getElementById('execute-transaction-button').addEventListener('click', function() {
+            executeTransaction('0.1'); // Замените '0.1' на желаемую сумму транзакции
+        });
+    </script>
+</body>
+</html>
